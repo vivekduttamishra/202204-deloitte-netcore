@@ -23,28 +23,42 @@ namespace MiddleWarePractice
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            Stopwatch stopwatch = new Stopwatch();
+            
+
+            app.Use(next => async context =>            
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                await next(context);
+                await context.Response.WriteAsync($"<p> this is footter </p>");
+                stopwatch.Stop();
+                Console.WriteLine($"time take for request to serve is {stopwatch.ElapsedMilliseconds} milliseconds");
+            });
+
             app.Use(next => async context =>
             {
-                stopwatch.Restart();
-                if (context.Request.Path.Value.Contains("/hello"))
+                if (context.Request.Path.Value.Contains("/books"))
                 {
-                    await context.Response.WriteAsync($"Hello {context.Request.Query["name"]}");
-
+                await Task.Delay(2000);
+                    await context.Response.WriteAsync("book details");
+                }
+                else
+                {
                     await next(context);
                 }
             });
-            app.Use(next => async context =>
-            {
-                await Task.Delay(2000);
-                await context.Response.WriteAsync("<p> this is footter </p>");
-                await next(context);
-            });
 
             app.Use(next => async context =>
             {
-                stopwatch.Stop();
-                Console.WriteLine($"time take for request to serve is {stopwatch.ElapsedMilliseconds} milliseconds");
+                if (context.Request.Path.Value.Contains("/authors"))
+                {
+                    await Task.Delay(3000);
+                    await context.Response.WriteAsync("author details");
+                }
+                else
+                {
+                    await next(context);
+                }
             });
         }
     }
