@@ -40,6 +40,7 @@ namespace ex1
             //Create a generic middleware that can execute an action based on a given URL. 
             app.Use(next => async context =>
             {
+                await context.Response.WriteAsync("<h1>Example Site</h1></hr>");
                 handleURL("test", context);
                 await next(context);
             });
@@ -47,8 +48,8 @@ namespace ex1
             //Create a middleware to add a footer information to all the request 
             app.Use(next => async context =>
             {
-                await context.Response.WriteAsync("<footer>footer section</footer>");
                 await next(context);
+                await context.Response.WriteAsync("<footer>footer section</footer>");                
             });
 
             //Create a middleware that can log the total time take by current request.
