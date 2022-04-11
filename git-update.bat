@@ -1,5 +1,3 @@
-@echo off
-
 set message=%*
 
 git add .
