@@ -19,5 +19,17 @@ namespace WebApp01
                     await next(context);
             });
         }
+        public static void ErrorandStatConfiguration(this IApplicationBuilder app, Action<string, string> action)
+        {
+            app.Use(next => async context =>
+            {
+                await next(context);
+                if (context.Response.StatusCode == 404)
+                    action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", "NotFound");
+                else
+                    action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", "Found");
+
+            });
+        }
     }
 }
