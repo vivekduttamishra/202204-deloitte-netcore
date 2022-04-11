@@ -1,0 +1,1 @@
+This is the first lesson to explain how to get it from the git
