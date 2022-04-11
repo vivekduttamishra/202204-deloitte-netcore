@@ -51,9 +51,6 @@ namespace WebApp01
             });
 
 
-
-
-
             app.Use(next => {
 
                 RequestDelegate thisMiddleware = async context =>
@@ -64,8 +61,6 @@ namespace WebApp01
 
                 return thisMiddleware;
             });
-
-
 
             app.Run(async context =>
             {
