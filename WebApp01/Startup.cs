@@ -23,10 +23,10 @@ namespace WebApp01
         {
             app.Use(next => async context =>
             {
-                //display a common message
+              
                 await context.Response.WriteAsync($"<h1>Book's Web</h1><hr/>");
-                //let other middleware do whatever they want.
-                await next(context);  //pass control to the next middleware
+              
+                await next(context);  
             });
 
             var time1 = DateTime.Now;
