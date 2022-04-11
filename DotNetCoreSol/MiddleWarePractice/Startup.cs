@@ -13,52 +13,71 @@ namespace MiddleWarePractice
 {
     public class Startup
     {
+        private Dictionary<string, int> validUrlVisitedCount = new Dictionary<string, int>();
+        private Dictionary<string, int> invalidUrlVistedCount = new Dictionary<string, int>();
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
         }
 
+        private void AddUrlCount(string url, ErrorType errorType)
+        {
+            if(errorType == ErrorType.Success)
+            {
+                AddCountToStats(validUrlVisitedCount, url);
+            }
+            else
+            {
+                AddCountToStats(invalidUrlVistedCount, url);
+            }
+        }
+
+        private void AddCountToStats(Dictionary<string, int> statsUrls, string url)
+        {
+            if(statsUrls.ContainsKey(url)){
+                statsUrls[url] = statsUrls[url] + 1;
+            }
+            else
+            {
+                statsUrls.Add(url, 1);
+            }
+        }
+
+        private async Task WriteStats(HttpContext context, Dictionary<string, int> stats)
+        {
+            foreach (var url in stats)
+            {
+                await context.Response.WriteAsync($"Url:{url.Key} Visited Count {url.Value} <br>");
+            }
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStats((url, err) => AddUrlCount(url, err));
 
-            
-
-            app.Use(next => async context =>            
+            app.UseOnUrl("/books", async context =>
             {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                await next(context);
-                await context.Response.WriteAsync($"<p> this is footter </p>");
-                stopwatch.Stop();
-                Console.WriteLine($"time take for request to serve is {stopwatch.ElapsedMilliseconds} milliseconds");
+                await context.Response.WriteAsync($"Book Details");
             });
 
-            app.Use(next => async context =>
+            app.UseOnUrl("/authors", async context =>
             {
-                if (context.Request.Path.Value.Contains("/books"))
-                {
-                await Task.Delay(2000);
-                    await context.Response.WriteAsync("book details");
-                }
-                else
-                {
-                    await next(context);
-                }
+                await context.Response.WriteAsync($"author Details");
             });
 
-            app.Use(next => async context =>
+            app.UseOnUrl("/stats", async context =>
             {
-                if (context.Request.Path.Value.Contains("/authors"))
-                {
-                    await Task.Delay(3000);
-                    await context.Response.WriteAsync("author details");
-                }
-                else
-                {
-                    await next(context);
-                }
+                await context.Response.WriteAsync("<h1>Valid URL's Visited</h1> <br>");
+                await WriteStats(context,validUrlVisitedCount);
+
+            });
+
+            app.UseOnUrl("/404", async context =>
+            {
+               await context.Response.WriteAsync("<h1>Invalid URL's Visited</h1> <br>");
+               await WriteStats(context ,invalidUrlVistedCount);
             });
         }
     }
