@@ -21,20 +21,52 @@ namespace WebApp2
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            int bookcount = 0;
+            int timecount = 0;
+            int count = 0;
+            app.UseOnUrl("/books", async context =>
             {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                bookcount++;
+                await context.Response.WriteAsync($"{context.Request.Host}/{context.Request.Path}: {bookcount}");
             });
+
+            app.UseOnUrl("/time", async context =>
+            {
+                timecount++;
+                await context.Response.WriteAsync($"{context.Request.Host}/{context.Request.Path}: {timecount}");
+            });
+
+            app.UseOnUrl("/404", async context =>
+            {
+                count++;
+                await context.Response.WriteAsync($"<p>{context.Request.Host}/{context.Request.Path}: {count}</p>");
+            });
+
+            app.UseOnUrl("/stats", async context =>
+            {
+                await context.Response.WriteAsync($"<p>{context.Request.Host}/books: {bookcount}</p>");
+                await context.Response.WriteAsync($"<p>{context.Request.Host}/time: {timecount}</p>");
+                await context.Response.WriteAsync($"<p>{context.Request.Host}/404: {count}</p>");
+            });
+
+            app.Use(next => {
+
+                RequestDelegate thisMiddleware = async context =>
+                {
+                    //perform whatever you want to
+                    await context.Response.WriteAsync($"{context.Request.Host}/{context.Request.Path}");
+                };
+
+                return thisMiddleware;
+            });
+
+            //unreachable code
+            app.Run(new RequestDelegate(Greet));
+        }
+
+        private async Task Greet(HttpContext context)
+        {
+            await context.Response.WriteAsync($"Hello World to {context.Request.Path} ");
         }
     }
 }
