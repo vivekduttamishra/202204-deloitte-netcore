@@ -36,6 +36,7 @@ namespace MiddleWarePractice
             });
             app.Use(next => async context =>
             {
+                await Task.Delay(2000);
                 await context.Response.WriteAsync("<p> this is footter </p>");
                 await next(context);
             });
