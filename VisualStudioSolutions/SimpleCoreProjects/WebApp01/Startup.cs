@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using WebApp01.Middlewares;
 using WebApp01.Services;
 
 namespace WebApp01
@@ -25,6 +26,9 @@ namespace WebApp01
             // services.AddSingleton<IGreetService, TimedGreetService>();
 
             services.AddSingleton<IGreetService, ConfigurableGreetServiceV3>();
+
+            services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,12 +41,16 @@ namespace WebApp01
 
             logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
 
+            app.UseStats(); //configures two middlewares
+
 
             if(env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+
+            
 
 
             if (env.EnvironmentName == "HarryPotter")
@@ -167,7 +175,7 @@ namespace WebApp01
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            Middlewares.UseOnUrl(app,"/time", async context =>
+            MyMiddlewares.UseOnUrl(app,"/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 

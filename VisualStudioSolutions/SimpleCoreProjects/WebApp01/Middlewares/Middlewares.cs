@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApp01
+namespace WebApp01.Middlewares
 {
 
     public enum MatchType
@@ -22,7 +22,7 @@ namespace WebApp01
     }
 
 
-    public static class Middlewares
+    public static class MyMiddlewares
     {
         public static void UseOnUrl(this IApplicationBuilder app, string url, RequestDelegate action, Action<UseOnUrlOptions> configure=null)
         {

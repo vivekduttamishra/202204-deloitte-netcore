@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
+using WebApp01.Middlewares;
 
 namespace WebApp01
 {
@@ -54,7 +55,7 @@ namespace WebApp01
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            Middlewares.UseOnUrl(app,"/time", async context =>
+            MyMiddlewares.UseOnUrl(app,"/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
