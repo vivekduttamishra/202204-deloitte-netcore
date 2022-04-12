@@ -7,9 +7,10 @@ namespace WebApp01.Services
 {
     public class TimedGreetService : IGreetService
     {
-        TimeUtil time = new TimeUtil();
-        public TimedGreetService()
+        TimeUtil time;
+        public TimedGreetService(TimeUtil time)
         {
+            this.time = time;
             Console.WriteLine($"TimedGreetService created with id {GetHashCode()}");
         }
 
