@@ -7,21 +7,40 @@
       "sslPort": 0
     }
   },
-  "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "WebApp01": {
-      "commandName": "Project",
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5000",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+    "profiles": {
+        "IIS Express": {
+            "commandName": "IISExpress",
+            "launchBrowser": true,
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        "K Developer": {
+            "commandName": "Project",
+            "launchBrowser": false,
+            "applicationUrl": "http://localhost:5000",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+
+        },
+        "K Production": {
+            "commandName": "Project",
+            "launchBrowser": false,
+            "applicationUrl": "http://localhost",
+            "environmentVariables": {
+
+            }
+        },
+        "HarryPotter": {
+            "commandName": "Project",
+            "launchBrowser": false,
+            "applicationUrl": "http://localhost:8000",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "HarryPotter"
+            }
+
+        }
+
     }
-  }
 }
