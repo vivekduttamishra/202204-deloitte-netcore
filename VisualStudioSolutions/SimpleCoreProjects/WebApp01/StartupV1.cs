@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WebApp01
 {
-    public class Startup
+    public class StartupV1
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -20,14 +20,14 @@ namespace WebApp01
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            //app.Use( next => async context =>
-            //{
+            app.Use( next => async context =>
+            {
 
-            //    await next(context); //let the other middleware work
-            //    //now I will add the footer
-            //    await context.Response.WriteAsync("<hr/><p>&copy; http://conceptarchitect.in</p>");
+                await next(context); //let the other middleware work
+                //now I will add the footer
+                await context.Response.WriteAsync("<hr/><p>&copy; http://conceptarchitect.in</p>");
 
-            //});
+            });
 
             app.Use(next => async context =>
             {
@@ -37,15 +37,6 @@ namespace WebApp01
                 await next(context);  //pass control to the next middleware
             });
 
-            app.UseOnUrl("/books", async context =>{
-                await context.Response.WriteAsync("Getting a List of books");
-            });
-
-            app.UseOnUrl("/books", async context => {
-                var fragments = context.Request.Path.Value.Split('/');
-                var id = fragments[2];
-                await context.Response.WriteAsync($"Getting Info about a specific book with id {id}");
-            }, opt=> opt.MatchType=MatchType.StartsWith);
 
             app.UseOnUrl("/long-running",  async context =>
             {
@@ -67,6 +58,7 @@ namespace WebApp01
 
             });
 
+
             app.Use (next => async context =>
             {
                 //this middleware just logs the information
@@ -75,6 +67,37 @@ namespace WebApp01
                 await next(context);  //pass control to the next middleware
             });
 
+
+            app.Use(next => {
+
+                Console.WriteLine("Configuring the catch all middleware");
+
+                RequestDelegate thisMiddleware = async context =>
+                {
+                    //perform whatever you want to
+                    Console.WriteLine("Reached to Catch All Middleware");
+                    await context.Response.WriteAsync($"Handled {context.Request.Path}");
+                };
+
+                return thisMiddleware;
+            });
+
+            app.Use(Greeter);
+
+
+
+            //middleware will be configured, but request shall never reach it
+            app.Run(async context =>
+            {
+                Console.WriteLine("reached to Time Middleware");
+                await context.Response.WriteAsync($"Time: {DateTime.Now.ToLongTimeString()}");
+            });
+
+            //this is called at startup
+            Console.WriteLine("reached to Greet Middleware");
+            //The middleware is configured. but because of earlier middleware
+            //It will never receive the request
+            app.Run(new RequestDelegate(Greet));
 
         }
 
