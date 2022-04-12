@@ -23,6 +23,29 @@ namespace MiddleWarePractice
             });
         }
 
+        public static void UseProctectedRoute(this IApplicationBuilder app, string url, RequestDelegate requestDelegate)
+        {
+            app.Use(next => async context =>
+            {
+               var userService = context.RequestServices.GetService<IUserManagementService>();
+                var token = context.Request.Query["token"];
+
+                if(context.Request.Path.Value != url)
+                {
+                    await next(context);
+                }
+                else if (context.Request.Path.Value == url && userService.ValidateToken(token))
+                {
+                    await requestDelegate(context);
+                }
+                else
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("unauthroized");
+                }
+            });
+        }
+
         public static void UseStats(this IApplicationBuilder app)
         {
             var statService = app.ApplicationServices.GetService<IStatsService>();
