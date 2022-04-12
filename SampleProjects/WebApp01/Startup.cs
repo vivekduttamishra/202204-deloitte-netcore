@@ -63,10 +63,6 @@ namespace WebApp01
             {
                 foreach (var x in keyValues)
                 {
-                    if (x.Key.Contains("stats"))
-                    {
-                        continue;
-                    }
                     await context.Response.WriteAsync($"{context.Request.Scheme}://{context.Request.Host}{x.Key} : {x.Value}<br/>");
                 }
             });
