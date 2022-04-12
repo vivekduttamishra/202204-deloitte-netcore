@@ -11,7 +11,7 @@ namespace WebApp01
     {
         public static void UseOnUrl(this IApplicationBuilder app, string url, RequestDelegate action)
         {
-            app.Use( next => async context =>
+            app.Use(next => async context =>
             {
                 if (context.Request.Path.Value == url)
                     await action(context);
@@ -19,5 +19,18 @@ namespace WebApp01
                     await next(context);
             });
         }
+        public static void ErrorandStatConfiguration(this IApplicationBuilder app, Action<string, string> action)
+        {
+            app.Use(next => async context =>
+            {
+                await next(context);
+                if (context.Response.StatusCode == 404)
+                    action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", "NotFound");
+                else
+                    action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", "Found");
+
+            });
+        }
     }
 }
+
