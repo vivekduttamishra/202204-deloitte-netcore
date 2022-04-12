@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using MiddleWarePractice.Interfaces;
 using System;
-using System.Threading.Tasks;
 
 namespace MiddleWarePractice
 {
@@ -11,7 +12,7 @@ namespace MiddleWarePractice
         {
             app.Use(next => async context =>
             {
-                if(context.Request.Path.Value == url)
+                if (context.Request.Path.Value == url)
                 {
                     await requestDelegate(context);
                 }
@@ -22,17 +23,49 @@ namespace MiddleWarePractice
             });
         }
 
-        public static void UseStats(this IApplicationBuilder app, Action<string, ErrorType> action)
+        public static void UseStats(this IApplicationBuilder app)
         {
+            var statService = app.ApplicationServices.GetService<IStatsService>();
             app.Use(next => async context =>
             {
                 await next(context);
-                if(context.Response.StatusCode == 200)
-                action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", ErrorType.Success);
+                if (context.Response.StatusCode == 200)
+                    statService.AddValidUrlCount($"{context.Request.Path.Value}{context.Request.QueryString.Value}");
                 else
-                action($"{context.Request.Path.Value}{context.Request.QueryString.Value}", ErrorType.Failed);
-
+                    statService.AddInvalidUrlCount($"{context.Request.Path.Value}{context.Request.QueryString.Value}");
             });
         }
+        public static void myDevExceptionHandle(this IApplicationBuilder app)
+        {
+            app.Use(next => async context =>
+            {
+                try
+                {
+                    await next(context);
+
+                }
+                catch (Exception ex)
+                {
+                    await context.Response.WriteAsync($"{ex.Message} \n {ex.StackTrace}");
+                }
+            });
+        }
+
+        public static void myProdExceptionHandle(this IApplicationBuilder app)
+        {
+            app.Use(next => async context =>
+            {
+                try
+                {
+                    await next(context);
+
+                }
+                catch (Exception)
+                {
+                    context.Response.Redirect("/error");
+                }
+            });
+        }
+
     }
 }

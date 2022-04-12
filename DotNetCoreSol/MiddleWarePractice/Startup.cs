@@ -3,62 +3,40 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MiddleWarePractice.Interfaces;
+using MiddleWarePractice.Services;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MiddleWarePractice
 {
     public class Startup
     {
-        private Dictionary<string, int> validUrlVisitedCount = new Dictionary<string, int>();
-        private Dictionary<string, int> invalidUrlVistedCount = new Dictionary<string, int>();
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IStatsService, StatsService>();
         }
 
-        private void AddUrlCount(string url, ErrorType errorType)
-        {
-            if(errorType == ErrorType.Success)
-            {
-                AddCountToStats(validUrlVisitedCount, url);
-            }
-            else
-            {
-                AddCountToStats(invalidUrlVistedCount, url);
-            }
-        }
+       
 
-        private void AddCountToStats(Dictionary<string, int> statsUrls, string url)
-        {
-            if(statsUrls.ContainsKey(url)){
-                statsUrls[url] = statsUrls[url] + 1;
-            }
-            else
-            {
-                statsUrls.Add(url, 1);
-            }
-        }
 
-        private async Task WriteStats(HttpContext context, Dictionary<string, int> stats)
-        {
-            foreach (var url in stats)
-            {
-                await context.Response.WriteAsync($"Url:{url.Key} Visited Count {url.Value} <br>");
-            }
-        }
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IStatsService statsService)
         {
-            app.UseStats((url, err) => AddUrlCount(url, err));
+            if (env.IsDevelopment())
+                app.myDevExceptionHandle();
+            else
+                app.myProdExceptionHandle();   
+
+            app.UseStats();
 
             app.UseOnUrl("/books", async context =>
             {
+                throw new Exception("my own exceptions");
                 await context.Response.WriteAsync($"Book Details");
             });
 
@@ -70,14 +48,19 @@ namespace MiddleWarePractice
             app.UseOnUrl("/stats", async context =>
             {
                 await context.Response.WriteAsync("<h1>Valid URL's Visited</h1> <br>");
-                await WriteStats(context,validUrlVisitedCount);
+                await context.Response.WriteAsync(statsService.GetValidUrlStats());
 
             });
 
             app.UseOnUrl("/404", async context =>
             {
                await context.Response.WriteAsync("<h1>Invalid URL's Visited</h1> <br>");
-               await WriteStats(context ,invalidUrlVistedCount);
+               await context.Response.WriteAsync(statsService.GetInvalidUrlStats());
+            });
+
+            app.UseOnUrl("/error", async context =>
+            {
+                await context.Response.WriteAsync($"Error Occured");
             });
         }
     }
