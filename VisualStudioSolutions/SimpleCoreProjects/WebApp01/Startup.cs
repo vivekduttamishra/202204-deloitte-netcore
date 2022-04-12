@@ -66,7 +66,6 @@ namespace WebApp01
             {
                 await context.Response.WriteAsync("<h1>URL's </h1> <br>");
                 await PrintUrls(context, StatUrlsCount);
-
             });
 
             app.UseOnUrl("/404", async context =>
