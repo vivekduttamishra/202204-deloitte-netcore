@@ -3,43 +3,169 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApp01.Middlewares;
+using WebApp01.Services;
 
 namespace WebApp01
 {
     public class Startup
     {
-        private Dictionary<string, int> StatUrlsCount = new Dictionary<string, int>();
-        private Dictionary<string, int> NotFoundUrls = new Dictionary<string, int>();
+        
+       
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SimpleGreetService>(); //only one object will be created before its first use.
+
+            services.AddSingleton<TimeUtil>();
+
+            // services.AddSingleton<IGreetService, TimedGreetService>();
+
+            services.AddSingleton<IGreetService, ConfigurableGreetServiceV3>();
+
+            services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app,
+                                IWebHostEnvironment env,
+                                ILogger<Startup> logger,
+                                IGreetService greetService                                
+                                )
         {
 
-            app.Use( next => async context =>
-            {
+            logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
 
-                await next(context); //let the other middleware work
-                //now I will add the footer
-                await context.Response.WriteAsync("<hr/><p>&copy; http://conceptarchitect.in</p>");
+            app.UseStats(); //configures two middlewares
+
+
+            //if(env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
+            if (env.IsDevelopment())
+            {
+                app.CustomDevExceptionHandler();
+            }
+            else
+            {
+                app.CustomProdExceptionHandler();
+            }
+            
+
+
+            if (env.EnvironmentName == "HarryPotter")
+            {
+                app.UseOnUrl("/hogwards", async context =>
+                {
+                    await context.Response.WriteAsync($"Welcome to Hogward school of wizard and witchcraft:" +
+                        $" ${context.Request.Path.Value.Replace("/", " ")}");
+                }, config=>config.MatchType=MatchType.Contains);
+
+            } 
+            //else
+            //{
+            //    app.UseOnUrl("/hogwards", async context =>
+            //    {
+            //        context.Response.StatusCode = 403;
+            //        await context.Response.WriteAsync($"Muggles are not allowed at Hogwards");
+            //    });
+            //}
+
+
+            app.UseOnUrl("/greet4", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+                
+                for (int i = 0; i < 5; i++)
+                {
+
+                    var message = greetService.Greet(name);
+                    logger.LogInformation($"service #{greetService.GetHashCode()} invoked");
+                    await context.Response.WriteAsync($"<p>{message}</p>");
+                }
+
+
+            }, opt => opt.MatchType = MatchType.StartsWith);
+
+
+            app.UseOnUrl("/greet3", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+                var scope = app.ApplicationServices.CreateScope();
+                for (int i = 0; i < 5; i++)
+                {
+                    
+                    var service = scope.ServiceProvider.GetService<IGreetService>();
+
+                    var message = service.Greet(name);
+
+                    await context.Response.WriteAsync($"<p>{message}</p>");
+                }
+
+
+            }, opt => opt.MatchType = MatchType.StartsWith);
+
+
+            app.UseOnUrl("/greet2", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+
+                for(int i=0;i<5;i++)
+                {
+                    var service = context.RequestServices.GetService<IGreetService>(); //get the service object from the provider
+
+                    var message = service.Greet(name);
+
+                    await context.Response.WriteAsync($"<p>{message}</p>");
+                }
+                
+
+            }, opt => opt.MatchType = MatchType.StartsWith);
+
+
+            app.UseOnUrl("/greet", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+
+                SimpleGreetService service=context.RequestServices.GetService<SimpleGreetService>(); //get the service object from the provider
+
+                var message = service.Greet(name);
+
+                await context.Response.WriteAsync(message);
+
+            }, opt=>opt.MatchType=MatchType.StartsWith);
+
+            // /hello?name=Vivek
+            app.UseOnUrl("/hello", async context =>
+            {
+                //getting data from query string
+                var name = context.Request.Query["name"];
+
+                //creating and using the service
+                var service = new SimpleGreetService();
+                var message = service.Greet(name);
+
+                //sending the response
+                await context.Response.WriteAsync(message);
 
             });
 
-            app.Use(next => async context =>
-            {
-                //display a common message
-                await context.Response.WriteAsync($"<h1>Book's Web</h1><hr/>");
-                //let other middleware do whatever they want.
-                await next(context);  //pass control to the next middleware
+
+            app.UseOnUrl("/books", async context =>{
+                await context.Response.WriteAsync("Getting a List of books");
             });
 
+            app.UseOnUrl("/books", async context => {
+                var fragments = context.Request.Path.Value.Split('/');
+                var id = fragments[2];
+                await context.Response.WriteAsync($"Getting Info about a specific book with id {id}");
+            }, opt=> opt.MatchType=MatchType.StartsWith);
 
             app.UseOnUrl("/long-running",  async context =>
             {
@@ -55,25 +181,11 @@ namespace WebApp01
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            Middlewares.UseOnUrl(app,"/time", async context =>
+            MyMiddlewares.UseOnUrl(app,"/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
             });
-            app.ErrorandStatConfiguration((url, err) => AddUrlsToDictionary(url, err));
-
-            app.UseOnUrl("/stats", async context =>
-            {
-                await context.Response.WriteAsync("<h1>URL's </h1> <br>");
-                await PrintUrls(context, StatUrlsCount);
-            });
-
-            app.UseOnUrl("/404", async context =>
-            {
-                await context.Response.WriteAsync("<h1>Unhandled Urls</h1> <br>");
-                await PrintUrls(context, NotFoundUrls);
-            });
-
 
             app.Use (next => async context =>
             {
@@ -84,61 +196,17 @@ namespace WebApp01
             });
 
 
-            app.Use(next => {
-
-                RequestDelegate thisMiddleware = async context =>
-                {
-                    //perform whatever you want to
-                    await context.Response.WriteAsync($"Handled {context.Request.Path}");
-                };
-
-                return thisMiddleware;
-            });
-
-            app.Run(async context =>
-            {
-                await context.Response.WriteAsync($"Time: {DateTime.Now.ToLongTimeString()}");
-            });
-
-
-            //unreachable code
-            app.Run(new RequestDelegate(Greet));
-
         }
+
+        public RequestDelegate Greeter (RequestDelegate next)
+        {
+            return Greet;
+        }
+
 
         private async Task Greet(HttpContext context)
         {
             await context.Response.WriteAsync($"Hello World to {context.Request.Path} ");
-        }
-        private async Task PrintUrls(HttpContext context, Dictionary<string, int> stats)
-        {
-            foreach (var url in stats)
-            {
-                await context.Response.WriteAsync($"Url:{url.Key} Visited Count {url.Value} <br>");
-            }
-        }
-        private void AddUrlsToDictionary(string url, string message)
-        {
-            if (message == "Found")
-            {
-                UrlsAddingorUpdating(StatUrlsCount, url);
-            }
-            else
-            {
-                UrlsAddingorUpdating(NotFoundUrls, url);
-            }
-        }
-
-        private void UrlsAddingorUpdating(Dictionary<string, int> statsUrls, string url)
-        {
-            if (statsUrls.ContainsKey(url))
-            {
-                statsUrls[url] += 1;
-            }
-            else
-            {
-                statsUrls.Add(url, 1);
-            }
         }
     }
 }
