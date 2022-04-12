@@ -28,6 +28,7 @@ namespace WebApp01
             services.AddSingleton<IGreetService, ConfigurableGreetServiceV3>();
 
             services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
+            services.AddSingleton<ISimpleUserManagementService, InMemorySimpleUserManagementService>();
 
         }
 
@@ -43,7 +44,11 @@ namespace WebApp01
 
             app.UseStats(); //configures two middlewares
 
-
+            app.UserManagementService();
+            app.UseProctectedRoute("/protected", async context =>
+            {
+                await context.Response.WriteAsync($"you have accessed proctected route");
+            });
             //if(env.IsDevelopment())
             //{
             //    app.UseDeveloperExceptionPage();

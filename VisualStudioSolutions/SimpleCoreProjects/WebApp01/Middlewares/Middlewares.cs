@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApp01.Services;
 
+using Microsoft.Extensions.DependencyInjection;
 namespace WebApp01.Middlewares
 {
 
@@ -54,6 +56,30 @@ namespace WebApp01.Middlewares
                     await action(context);
                 else
                     await next(context);
+            });
+        }
+
+        public static void UseProctectedRoute(this IApplicationBuilder app, string url, RequestDelegate requestDelegate)
+        {
+            app.Use(next => async context =>
+            {
+                var service = context.RequestServices.GetService<ISimpleUserManagementService>();
+                var token = context.Request.Query["token"];
+
+                if (context.Request.Path.Value != url)
+       
+                {
+                    await next(context);
+                }
+                else if (context.Request.Path.Value == url && service.TokenAuthentication(token))
+                {
+                    await requestDelegate(context);
+                }
+                else
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Token is not process, so unauthroized");
+                }
             });
         }
     }
