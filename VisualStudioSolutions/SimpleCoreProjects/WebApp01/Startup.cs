@@ -35,6 +35,35 @@ namespace WebApp01
                                 )
         {
 
+            logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
+
+
+            if(env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+
+
+            if (env.EnvironmentName == "HarryPotter")
+            {
+                app.UseOnUrl("/hogwards", async context =>
+                {
+                    await context.Response.WriteAsync($"Welcome to Hogward school of wizard and witchcraft:" +
+                        $" ${context.Request.Path.Value.Replace("/", " ")}");
+                }, config=>config.MatchType=MatchType.Contains);
+
+            } 
+            //else
+            //{
+            //    app.UseOnUrl("/hogwards", async context =>
+            //    {
+            //        context.Response.StatusCode = 403;
+            //        await context.Response.WriteAsync($"Muggles are not allowed at Hogwards");
+            //    });
+            //}
+
+
             app.UseOnUrl("/greet4", async context =>
             {
                 var name = context.Request.Path.Value.Split("/")[2];
