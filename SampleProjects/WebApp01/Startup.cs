@@ -71,14 +71,10 @@ namespace WebApp01
                 }
             });
 
-            app.UseOnUrl("/unHandledUrls", async context =>
+            app.UseOnUrl("/unhandledUrls", async context =>
             {
                 foreach (var x in keyValuePairs)
                 {
-                    if (x.Key.Contains("unHandledUrls"))
-                    {
-                        continue;
-                    }
                     await context.Response.WriteAsync($"{context.Request.Scheme}://{context.Request.Host}{x.Key} : {x.Value}<br/>");
                 }
             });
