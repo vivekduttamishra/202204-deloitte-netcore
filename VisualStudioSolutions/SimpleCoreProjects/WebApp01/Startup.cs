@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
+using WebApp01.Services;
 
 namespace WebApp01
 {
@@ -14,28 +15,77 @@ namespace WebApp01
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SimpleGreetService>(); //only one object will be created before its first use.
+
+            services.AddScoped<IGreetService, TimedGreetService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            //app.Use( next => async context =>
-            //{
-
-            //    await next(context); //let the other middleware work
-            //    //now I will add the footer
-            //    await context.Response.WriteAsync("<hr/><p>&copy; http://conceptarchitect.in</p>");
-
-            //});
-
-            app.Use(next => async context =>
+            app.UseOnUrl("/greet3", async context =>
             {
-                //display a common message
-                await context.Response.WriteAsync($"<h1>Book's Web</h1><hr/>");
-                //let other middleware do whatever they want.
-                await next(context);  //pass control to the next middleware
+                var name = context.Request.Path.Value.Split("/")[2];
+                var scope = app.ApplicationServices.CreateScope();
+                for (int i = 0; i < 5; i++)
+                {
+                    
+                    var service = scope.ServiceProvider.GetService<IGreetService>();
+
+                    var message = service.Greet(name);
+
+                    await context.Response.WriteAsync($"<p>{message}</p>");
+                }
+
+
+            }, opt => opt.MatchType = MatchType.StartsWith);
+
+
+            app.UseOnUrl("/greet2", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+
+                for(int i=0;i<5;i++)
+                {
+                    var service = context.RequestServices.GetService<IGreetService>(); //get the service object from the provider
+
+                    var message = service.Greet(name);
+
+                    await context.Response.WriteAsync($"<p>{message}</p>");
+                }
+                
+
+            }, opt => opt.MatchType = MatchType.StartsWith);
+
+
+            app.UseOnUrl("/greet", async context =>
+            {
+                var name = context.Request.Path.Value.Split("/")[2];
+
+                SimpleGreetService service=context.RequestServices.GetService<SimpleGreetService>(); //get the service object from the provider
+
+                var message = service.Greet(name);
+
+                await context.Response.WriteAsync(message);
+
+            }, opt=>opt.MatchType=MatchType.StartsWith);
+
+            // /hello?name=Vivek
+            app.UseOnUrl("/hello", async context =>
+            {
+                //getting data from query string
+                var name = context.Request.Query["name"];
+
+                //creating and using the service
+                var service = new SimpleGreetService();
+                var message = service.Greet(name);
+
+                //sending the response
+                await context.Response.WriteAsync(message);
+
             });
+
 
             app.UseOnUrl("/books", async context =>{
                 await context.Response.WriteAsync("Getting a List of books");

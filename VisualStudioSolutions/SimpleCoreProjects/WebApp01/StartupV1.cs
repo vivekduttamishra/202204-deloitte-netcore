@@ -47,6 +47,8 @@ namespace WebApp01
 
             });
 
+            
+
             app.UseOnUrl("/date", async context =>
             {
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
