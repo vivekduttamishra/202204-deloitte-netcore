@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WebApp01
 {
-    public class Startup
+    public class StartupV0
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -38,24 +38,32 @@ namespace WebApp01
             });
 
 
-            app.UseOnUrl("/long-running",  async context =>
+            app.Use(next => async context =>
             {
-                
-                await context.Response.WriteAsync("Long running The work started...");
-                await Task.Delay(2000);
-                await context.Response.WriteAsync("Long running workd finished...");
+                if (context.Request.Path.Value.Contains("/long-running"))
+                {
+                    await context.Response.WriteAsync("Long running The work started...");
+                    await Task.Delay(2000);
+                    await context.Response.WriteAsync("Long running workd finished...");
 
+                }
+                else
+                {
+                    await next(context); //I don't handle this url. let someone else handle it. I don't care.
+                }
             });
 
-            app.UseOnUrl("/date", async context =>
-            {
-                await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
-            });
 
-            Middlewares.UseOnUrl(app,"/time", async context =>
+            app.Use(next => async context =>
             {
-                  await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
+                if(context.Request.Path.Value.Contains("/time"))
+                {
+                    await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
+                }else
+                {
+                    await next(context); //I don't handle this url. let someone else handle it. I don't care.
+                }
             });
 
 
