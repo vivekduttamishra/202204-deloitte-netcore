@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace WebApp01.Middlewares
 {
@@ -56,5 +59,42 @@ namespace WebApp01.Middlewares
                     await next(context);
             });
         }
+
+
+        public static void UseBefore(this IApplicationBuilder app, RequestDelegate action)
+        {
+            app.Use(next => async context =>
+           {
+               await action(context);
+               await next(context);
+           });
+        }
+
+
+        public static void UseAfter(this IApplicationBuilder app, RequestDelegate action)
+        {
+            app.Use(next => async context =>
+            {   
+                await next(context);
+                await action(context);
+            });
+        }
+
+
+       public static void UsePeformanceLogger(this IApplicationBuilder app)
+        {
+            app.Use( next => async context =>
+            {
+                var logger = context.RequestServices.GetService<ILogger<object>>();
+                var stopWatch= Stopwatch.StartNew();
+                await next(context);
+                stopWatch.Stop();
+                logger.LogInformation($"{context.Request.Path} took {stopWatch.ElapsedMilliseconds} ms to complete");              
+                
+
+            });
+        }
+
+
     }
 }

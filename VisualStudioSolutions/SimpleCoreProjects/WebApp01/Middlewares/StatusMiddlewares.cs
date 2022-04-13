@@ -19,13 +19,24 @@ namespace WebApp01.Middlewares
             IUrlStatsService service = app.ApplicationServices.GetService<IUrlStatsService>();
 
 
-            app.Use( next => async context =>
+            //app.Use( next => async context =>
+            //{
+            //    await service.AddVisitedUrl(context.Request.Path);
+
+            //    await next(context);
+            //});
+
+            app.UseBefore(async context => await service.AddVisitedUrl(context.Request.Path));
+
+            app.UseAfter( async context =>
             {
-                await service.AddVisitedUrl(context.Request.Path);
 
-                await next(context);
+                if(context.Response.StatusCode==404)
+                {
+                    await service.AddNotFound(context.Request.Path);
+                }
+
             });
-
 
             app.UseOnUrl( "/stats", async context =>
             {
@@ -43,7 +54,28 @@ namespace WebApp01.Middlewares
 
                 await context.Response.WriteAsync(html.ToString());
             });
-            
+
+            app.UseOnUrl("/404", async context =>
+            {
+
+                var html = new StringBuilder("<html><head><title>Urls Stats</title></head><body><h1>Not Found URL Requested</h1>");
+
+                html.Append("<ul>");
+
+                var urls = await service.GetNotFoundUrls();
+                foreach (var url in urls)
+                {
+                    html.Append($"<li>{url}</li>");
+                }
+
+                html.Append("</ul></body></html>");
+
+                await context.Response.WriteAsync(html.ToString());
+
+            });
+        
+        
+        
         }
 
 

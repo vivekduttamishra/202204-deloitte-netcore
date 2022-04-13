@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using WebApp01.Middlewares;
 using WebApp01.Services;
+using WebApp01.Authentication;
 
 namespace WebApp01
 {
@@ -29,6 +30,7 @@ namespace WebApp01
 
             services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
 
+            services.AddAuthenticationService();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +43,9 @@ namespace WebApp01
 
             logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
 
+            app.UsePeformanceLogger();
+            app.UseUserAuthentication();
+
             app.UseStats(); //configures two middlewares
 
 
@@ -48,6 +53,9 @@ namespace WebApp01
             {
                 app.UseDeveloperExceptionPage();
             }
+
+
+
 
 
             
@@ -61,7 +69,7 @@ namespace WebApp01
                         $" ${context.Request.Path.Value.Replace("/", " ")}");
                 }, config=>config.MatchType=MatchType.Contains);
 
-            } 
+            }
             //else
             //{
             //    app.UseOnUrl("/hogwards", async context =>
@@ -71,6 +79,12 @@ namespace WebApp01
             //    });
             //}
 
+            app.UseProtectedRoute("/profile", async context =>
+            {
+                var user = context.Request.Headers["UserName"];
+                await context.Response.WriteAsync($"<h1>Welcome {user}</h1>");
+
+            });
 
             app.UseOnUrl("/greet4", async context =>
             {
@@ -175,11 +189,12 @@ namespace WebApp01
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            MyMiddlewares.UseOnUrl(app,"/time", async context =>
+            app.UseOnUrl("/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
-            });
+            }, opt=> opt.MatchType=MatchType.Contains);
+
 
             app.Use (next => async context =>
             {
@@ -187,6 +202,25 @@ namespace WebApp01
                 Console.WriteLine($"Received {context.Request.Method} {context.Request.Path} " );
                 //there is not visible output here.
                 await next(context);  //pass control to the next middleware
+            });
+
+
+            // all routes below this point should be protected
+            app.UseProtectAll();
+
+            app.UseOnUrl("/admin", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Admin Page</h1>");
+            });
+
+            app.UseOnUrl("/secret", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Secret Page</h1>");
+            });
+
+            app.UseOnUrl("/orders", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Orders Page</h1>");
             });
 
 
