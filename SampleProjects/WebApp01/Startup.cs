@@ -44,7 +44,8 @@ namespace WebApp01
                     bool IsValidToken = await service.IsValidToken(user);
                     if (IsValidToken)
                     {
-                        await context.Response.WriteAsync("User 1");
+                        User user1 = await service.GetUser(user.Email);
+                        await context.Response.WriteAsync($"User Name is {user1.Name}");
                     }
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await context.Response.WriteAsync($"{context.Response.StatusCode}");

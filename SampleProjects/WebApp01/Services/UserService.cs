@@ -29,13 +29,21 @@ namespace WebApp01.Services
         {
             if (users.Count > 0 )
             {
-                string token = users.FirstOrDefault(x => x.Email.Equals(user.Email) && x.Password.Equals(user.Password)).Token;
-                if (token == null)
+                User user1 = users.FirstOrDefault(x => x.Email.Equals(user.Email) && x.Password.Equals(user.Password));
+                if (user1 == null)
                 {
-                    token = GetHashCode().ToString();
-                    users.FirstOrDefault(x => x.Email.Equals(user.Email)).Token = token;
+                    return "Please enter valid email and password";
                 }
-                return token;
+                else
+                {
+                    if (user1.Token == null)
+                    {
+                        user1.Token= GetHashCode().ToString();
+                        users.FirstOrDefault(x => x.Email.Equals(user.Email)).Token = user1.Token;
+                    }
+                    return user1.Token;
+                }
+                
             }
             else
             {
@@ -51,6 +59,11 @@ namespace WebApp01.Services
                 return $"{user.Email} has been logged out successfully.";
             }
             return $"{user.Email} not logged in.";
+        }
+
+        public async Task<User> GetUser(string email)
+        {
+            return users.FirstOrDefault(x => x.Email.Equals(email));
         }
 
         public async Task<bool> IsValidToken(User user)

@@ -10,6 +10,8 @@ namespace WebApp01.Services
 
         Task<string> Logout(User user);
 
+        Task<User> GetUser(string email);
+
         Task<bool> IsValidToken(User user);
     }
 }
