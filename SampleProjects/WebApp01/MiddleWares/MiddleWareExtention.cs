@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace WebApp01
+namespace WebApp01.MiddleWares
 {
     public static class MiddleWareExtention
     {

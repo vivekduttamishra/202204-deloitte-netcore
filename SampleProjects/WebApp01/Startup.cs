@@ -3,29 +3,52 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using WebApp01.MiddleWares;
+using WebApp01.Services;
 
 namespace WebApp01
 {
     public class Startup
     {
-        Dictionary<string, int> keyValues = new Dictionary<string, int>();
-        Dictionary<string, int> keyValuePairs = new Dictionary<string, int>();
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IUrlService, StatsService>();
+            services.AddSingleton<IUserAthenticationService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            DateTime dateTime = DateTime.Now;
-            app.Use(next => async context =>
+            app.AuthenticateUser();
+
+            app.UseStats();
+
+            app.UseOnUrl("/User", async context =>
             {
-                await CaptureUrl(context.Request.Path.Value, keyValues);
-                await next(context);
+                if(!context.Request.Query.ContainsKey("token"))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync($"{context.Response.StatusCode}");
+                }
+                else
+                {
+                    User user = new User()
+                    {
+                        Email = context.Request.Query["email"],
+                        Token = context.Request.Query["token"]
+                    };
+                    IUserAthenticationService service = app.ApplicationServices.GetService<IUserAthenticationService>();
+                    bool IsValidToken = await service.IsValidToken(user);
+                    if (IsValidToken)
+                    {
+                        await context.Response.WriteAsync("User 1");
+                    }
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync($"{context.Response.StatusCode}");
+                }
             });
 
             app.UseOnUrl("/Hello", async context =>
@@ -35,11 +58,9 @@ namespace WebApp01
 
             app.UseOnUrl("/long-running", async context =>
             {
-
-                await context.Response.WriteAsync("Long running The work started...");
+                await context.Response.WriteAsync("Long running The work started...</br>");
                 await Task.Delay(2000);
                 await context.Response.WriteAsync("Long running workd finished...");
-
             });
 
             app.UseOnUrl("/date", async context =>
@@ -50,48 +71,19 @@ namespace WebApp01
             app.UseOnUrl("/time", async context =>
             {
                 await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
-
             });
 
-            app.UseOnUrl("/timeTaken", async context =>
+            app.UseOnUrl("/totalTimeTaken", async context =>
             {
-                await Task.Delay(99999999);
-                await context.Response.WriteAsync($"Time now is {DateTime.Now-dateTime}");
-            });
-
-            app.UseOnUrl("/stats", async context =>
-            {
-                foreach (var x in keyValues)
-                {
-                    await context.Response.WriteAsync($"{context.Request.Scheme}://{context.Request.Host}{x.Key} : {x.Value}<br/>");
-                }
-            });
-
-            app.UseOnUrl("/unhandledUrls", async context =>
-            {
-                foreach (var x in keyValuePairs)
-                {
-                    await context.Response.WriteAsync($"{context.Request.Scheme}://{context.Request.Host}{x.Key} : {x.Value}<br/>");
-                }
+                await Task.Delay(2000);
             });
 
             app.Use(next => async context =>
             {
-                await CaptureUrl(context.Request.Path.Value, keyValuePairs);
-                await next(context);
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                IUrlService service = app.ApplicationServices.GetService<IUrlService>();
+                await service.StoreUnHandledUrls(context.Request.Path.Value);
             });
-
-            async Task CaptureUrl(string url, Dictionary<string, int> keyValues)
-            {
-                if (keyValues.ContainsKey(url))
-                {
-                    keyValues[url] += 1;
-                }
-                else
-                {
-                    keyValues.Add(url, 1);
-                }
-            }
         }
     }
 }
