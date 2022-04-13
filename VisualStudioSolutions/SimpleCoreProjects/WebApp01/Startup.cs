@@ -31,6 +31,8 @@ namespace WebApp01
             services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
 
             services.AddAuthenticationService();
+
+            services.AddControllersWithViews(); //enable MVC services
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +43,8 @@ namespace WebApp01
                                 )
         {
 
+            
+
             logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
 
             app.UsePeformanceLogger();
@@ -48,6 +52,8 @@ namespace WebApp01
 
             app.UseStats(); //configures two middlewares
 
+            //app.UseMiddleware<StaticFileMiddleware>();
+            app.UseStaticFileMiddleware();
 
             if(env.IsDevelopment())
             {
@@ -78,6 +84,14 @@ namespace WebApp01
             //        await context.Response.WriteAsync($"Muggles are not allowed at Hogwards");
             //    });
             //}
+
+            app.UseRouting();
+            app.UseEndpoints(config =>
+            {
+                config.MapControllerRoute("DefaultRoute",
+                        "{controller=Greet}/{action=Welcome}/{id?}"
+                    );
+            });
 
             app.UseProtectedRoute("/profile", async context =>
             {
@@ -137,7 +151,7 @@ namespace WebApp01
             }, opt => opt.MatchType = MatchType.StartsWith);
 
 
-            app.UseOnUrl("/greet", async context =>
+            app.UseOnUrl("/greet1", async context =>
             {
                 var name = context.Request.Path.Value.Split("/")[2];
 
@@ -148,6 +162,8 @@ namespace WebApp01
                 await context.Response.WriteAsync(message);
 
             }, opt=>opt.MatchType=MatchType.StartsWith);
+
+            app.UseStaticFiles();
 
             // /hello?name=Vivek
             app.UseOnUrl("/hello", async context =>

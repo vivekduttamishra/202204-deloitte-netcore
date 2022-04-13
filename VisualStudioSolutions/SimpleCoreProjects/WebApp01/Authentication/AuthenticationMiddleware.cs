@@ -1,14 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using WebApp01.Middlewares;
 
 namespace WebApp01.Authentication
@@ -135,8 +128,8 @@ namespace WebApp01.Authentication
                   var user = context.Request.Headers["UserName"];
                   if (string.IsNullOrEmpty(user))
                   {
-                      context.Response.StatusCode = 401;
-                      await context.Response.WriteAsync("invalid/missing token");
+                      context.Response.StatusCode = 404;
+                      //await context.Response.WriteAsync("invalid/missing token");
 
                   }
                   else
