@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloMVC", "HelloMVC\HelloM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMVCApp", "SimpleMVCApp\SimpleMVCApp.csproj", "{D7E03662-EC7D-41FF-A953-FAC537EB5268}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspnetFull", "AspnetFull\AspnetFull.csproj", "{9F912415-DB5C-4617-9AD5-D91589EBC23B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D7E03662-EC7D-41FF-A953-FAC537EB5268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7E03662-EC7D-41FF-A953-FAC537EB5268}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7E03662-EC7D-41FF-A953-FAC537EB5268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F912415-DB5C-4617-9AD5-D91589EBC23B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F912415-DB5C-4617-9AD5-D91589EBC23B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F912415-DB5C-4617-9AD5-D91589EBC23B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F912415-DB5C-4617-9AD5-D91589EBC23B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

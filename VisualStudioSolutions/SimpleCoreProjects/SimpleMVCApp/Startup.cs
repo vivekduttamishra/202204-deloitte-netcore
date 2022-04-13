@@ -31,7 +31,10 @@ namespace SimpleMVCApp
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllerRoute("MyMvcRoute",
+                    "{controller}/{action}/{id}",
+                    new {controller="info", action="home",id=""}
+                );
             });
         }
     }
