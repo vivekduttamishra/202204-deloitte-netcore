@@ -17,18 +17,16 @@
 
     <div class="content">
 
-        <h1>Info - Home</h1>
-        @{
-            var date = DateTime.Now;
-        }
+        <h1>Info - @ViewData["PageTitle"]</h1>
+       
 
-        <p>Date is <strong>@date.ToLongDateString()</strong></p>
-        <p>Time is <strong>@date.ToLongTimeString()</strong></p>
+        <p>Date is <strong>@ViewBag.Date.ToLongDateString()</strong></p>
+        <p>Time is <strong>@ViewBag.Date.ToLongTimeString()</strong></p>
 
     </div>
 
     <footer>
-        &copy; vivek@conceptarchitect.in | follow us on @@vivekdmishra
+        &copy; @ViewBag.Email | follow us on @@vivekdmishra
     </footer>
 
 

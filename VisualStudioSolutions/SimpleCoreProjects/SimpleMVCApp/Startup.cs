@@ -27,13 +27,15 @@ namespace SimpleMVCApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseFileServer();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("MyMvcRoute",
-                    "{controller}/{action}/{id}",
-                    new {controller="info", action="home",id=""}
+                    "{controller=info}/{action=home}/{id?}"
+                    
                 );
             });
         }

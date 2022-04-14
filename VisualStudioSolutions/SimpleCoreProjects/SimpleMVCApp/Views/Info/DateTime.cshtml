@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@model SimpleMVCApp.Entities.DateInfo
+<!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -17,13 +18,11 @@
 
     <div class="content">
 
-        <h1>Info - Home</h1>
-        @{
-            var date = DateTime.Now;
-        }
+        <h1>Time Server - @Model.Title</h1>
+       
 
-        <p>Date is <strong>@date.ToLongDateString()</strong></p>
-        <p>Time is <strong>@date.ToLongTimeString()</strong></p>
+        <p>Date is <strong>@Model.Date.ToLongDateString()</strong></p>
+        <p>Time is <strong>@Model.Date.ToLongTimeString()</strong></p>
 
     </div>
 

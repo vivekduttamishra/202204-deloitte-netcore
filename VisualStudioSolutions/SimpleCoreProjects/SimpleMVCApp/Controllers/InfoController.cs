@@ -2,6 +2,7 @@
 using SimpleMVCApp.Entities;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -74,6 +75,78 @@ namespace SimpleMVCApp
             return View();
         }
 
+        public ViewResult Now()
+        {
+            ViewData["PageTitle"] = "Time Server";
+            ViewBag.Date = DateTime.Now;
+            ViewBag.Email = "vivek@infoserver.com";
+            return View();
+        }
+
+
+        public ViewResult Today()
+        {
+            var model = new DateInfo()
+            {
+                Title = "Today",
+                Date = DateTime.Now
+            };
+
+            return View("DateTime",model);  //pass model to view.
+        }
+
+        public ViewResult Tomorrow()
+        {
+            var model = new DateInfo()
+            {
+                Title = "Tomorrow",
+                Date = DateTime.Now.AddDays(1)
+            };
+
+            return View("DateTime", model);
+        }
+
+        public ViewResult After(int days)
+        {
+            var model = new DateInfo()
+            {
+                Title = $"After {days} days",
+                Date = DateTime.Now.AddDays(days)
+            };
+
+            return View("DateTime", model);
+        }
+
+        public ActionResult AfterDays(int? id)
+        {
+            try
+            {
+                var days = id.Value;
+                var model = new DateInfo()
+                {
+                    Title = $"After {id} days",
+                    Date = DateTime.Now.AddDays(days)
+                };
+
+                return View("DateTime", model);
+            }
+            catch(Exception e)
+            {
+                //choice #1 ---> call today action
+                //return Today();
+
+                //choice #2 ---> redirect to today
+                //return RedirectToAction("Today");
+
+                //choice #3 ---> show error page
+                Response.StatusCode = 400; //Bad Request
+                return View("ErrorView", (object)"Missing days");
+
+            }
+
+
+        }
+                        
 
     }
 }
