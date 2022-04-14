@@ -12,9 +12,6 @@ namespace Assignment1
 {
     public class Startup
     {
-        public static Dictionary<string, int> validRouteFrequency = new Dictionary<string, int>();
-        public static Dictionary<string, int> invalidRouteFrequency = new Dictionary<string, int>();
-
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -24,20 +21,19 @@ namespace Assignment1
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-        
-            app.Use(next => async context =>
-            {
-                //display a common message
-                await context.Response.WriteAsync($"<h1>Book's Web</h1><hr/>");
-                //let other middleware do whatever they want.
-                await next(context);  //pass control to the next middleware
-            });
-
+            //app.Use(next => async context =>
+            //{
+            //    //display a common message
+            //    await context.Response.WriteAsync($"<h1>Book's Web</h1><hr/>");
+            //    //let other middleware do whatever they want.
+            //    await next(context);  //pass control to the next middleware
+            //});
+            app.UseStaticFiles();
             app.UseOnUrl("/books", async context =>
             {
                 var id = context.Request.Query["id"].ToString();
 
-                if(string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(id))
                 {
                     await context.Response.WriteAsync("All Books...");
                 }
@@ -56,22 +52,20 @@ namespace Assignment1
             app.UseOnUrl("/stats", async context =>
             {
                 await context.Response.WriteAsync("All Valid Routes...<hr/>");
-                foreach (var route in ValidRouteFrequency.GetLog())
-                {
-                    await context.Response.WriteAsync($"{route.Key} : <b>{route.Value}</b> <br/>");
-                }
+                //foreach (var route in ValidRouteFrequency.GetLog())
+                //{
+                //    await context.Response.WriteAsync($"{route.Key} : <b>{route.Value}</b> <br/>");
+                //}
             });
 
             app.UseOnUrl("/404", async context =>
             {
                 await context.Response.WriteAsync("All Invalid Routes...<hr/>");
-                foreach (var route in InvalidRouteFrequency.GetLog())
-                {
-                    await context.Response.WriteAsync($"{route.Key} : <b>{route.Value}</b> <br/>");
-                }
+                //foreach (var route in InvalidRouteFrequency.GetLog())
+                //{
+                //    await context.Response.WriteAsync($"{route.Key} : <b>{route.Value}</b> <br/>");
+                //}
             });
         }
-
-
     }
 }

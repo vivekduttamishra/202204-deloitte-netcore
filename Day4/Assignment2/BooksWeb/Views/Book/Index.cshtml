@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Book>
+
+<h1 class="text-center">List of Books</h1>
+
+<div class="row">
+    @foreach(var book in Model)
+    {
+        <a class="col-sm-6 col-lg-3 mb-3" href="#">
+            <div class="card">
+            <img class="card-img-top" src="@book.Cover" alt="@book.Title" height="300">
+            <div class="card-body">
+                <h5 class="card-title">@book.Title</h5>
+                <p class="card-text">@book.Description.Substring(0,50)</p>
+                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            </div>
+            </div>
+        </a>        
+    }
+</div>
+
+

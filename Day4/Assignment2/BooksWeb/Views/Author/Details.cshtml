@@ -1,0 +1,29 @@
+﻿@model Author
+
+<div class="container">
+     <div class="d-flex justify-content-center align-items-center flex-column ">
+        <img src="@Model.Photo" name="@Model.Name" width="200" height="200" border="0" class="rounded-circle my-2">
+        <h1 class="h4">@Model.Name</h1>
+        <p class="text-center">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem dui, tempor sit amet commodo a, vulputate vel tellus.</p>
+        <br>
+    </div>
+    <div class="jumbotron">
+        <h1 class="display-4">Books</h1>
+        <hr class="my-4">
+       <div class="row">
+           @foreach(var book in Model.Books)
+           {
+               <a class="col-3" href="#">
+                <div class="card ">
+                    <img class="card-img-top mt-3" src="@book.Cover" alt="@book.Title">
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text">@book.Description.Substring(0,50)</p>
+                    </div>
+                </div>
+            </a>
+           }
+        </div>
+    </div>
+</div>
