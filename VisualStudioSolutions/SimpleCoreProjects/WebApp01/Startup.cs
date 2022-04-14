@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using WebApp01.Middlewares;
 using WebApp01.Services;
+using WebApp01.Authentication;
 
 namespace WebApp01
 {
@@ -28,8 +29,10 @@ namespace WebApp01
             services.AddSingleton<IGreetService, ConfigurableGreetServiceV3>();
 
             services.AddSingleton<IUrlStatsService,InMemoryUrlStatsService>();
-            services.AddSingleton<ISimpleUserManagementService, InMemorySimpleUserManagementService>();
 
+            services.AddAuthenticationService();
+
+            services.AddControllersWithViews(); //enable MVC services
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,27 +43,27 @@ namespace WebApp01
                                 )
         {
 
+            
+
             logger.LogInformation($"Current Environment is '{env.EnvironmentName}'");
+
+            app.UsePeformanceLogger();
+            app.UseUserAuthentication();
 
             app.UseStats(); //configures two middlewares
 
-            app.UserManagementService();
-            app.UseProctectedRoute("/protected", async context =>
+            //app.UseMiddleware<StaticFileMiddleware>();
+            app.UseStaticFileMiddleware();
+
+            if(env.IsDevelopment())
             {
-                await context.Response.WriteAsync($"you have accessed proctected route");
-            });
-            //if(env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
-            if (env.IsDevelopment())
-            {
-                app.CustomDevExceptionHandler();
+                app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.CustomProdExceptionHandler();
-            }
+
+
+
+
+
             
 
 
@@ -72,7 +75,7 @@ namespace WebApp01
                         $" ${context.Request.Path.Value.Replace("/", " ")}");
                 }, config=>config.MatchType=MatchType.Contains);
 
-            } 
+            }
             //else
             //{
             //    app.UseOnUrl("/hogwards", async context =>
@@ -82,6 +85,20 @@ namespace WebApp01
             //    });
             //}
 
+            app.UseRouting();
+            app.UseEndpoints(config =>
+            {
+                config.MapControllerRoute("DefaultRoute",
+                        "{controller=Greet}/{action=Welcome}/{id?}"
+                    );
+            });
+
+            app.UseProtectedRoute("/profile", async context =>
+            {
+                var user = context.Request.Headers["UserName"];
+                await context.Response.WriteAsync($"<h1>Welcome {user}</h1>");
+
+            });
 
             app.UseOnUrl("/greet4", async context =>
             {
@@ -134,7 +151,7 @@ namespace WebApp01
             }, opt => opt.MatchType = MatchType.StartsWith);
 
 
-            app.UseOnUrl("/greet", async context =>
+            app.UseOnUrl("/greet1", async context =>
             {
                 var name = context.Request.Path.Value.Split("/")[2];
 
@@ -145,6 +162,8 @@ namespace WebApp01
                 await context.Response.WriteAsync(message);
 
             }, opt=>opt.MatchType=MatchType.StartsWith);
+
+            app.UseStaticFiles();
 
             // /hello?name=Vivek
             app.UseOnUrl("/hello", async context =>
@@ -186,11 +205,12 @@ namespace WebApp01
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            MyMiddlewares.UseOnUrl(app,"/time", async context =>
+            app.UseOnUrl("/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
-            });
+            }, opt=> opt.MatchType=MatchType.Contains);
+
 
             app.Use (next => async context =>
             {
@@ -198,6 +218,25 @@ namespace WebApp01
                 Console.WriteLine($"Received {context.Request.Method} {context.Request.Path} " );
                 //there is not visible output here.
                 await next(context);  //pass control to the next middleware
+            });
+
+
+            // all routes below this point should be protected
+            app.UseProtectAll();
+
+            app.UseOnUrl("/admin", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Admin Page</h1>");
+            });
+
+            app.UseOnUrl("/secret", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Secret Page</h1>");
+            });
+
+            app.UseOnUrl("/orders", async context =>
+            {
+                await context.Response.WriteAsync("<h1>Orders Page</h1>");
             });
 
 

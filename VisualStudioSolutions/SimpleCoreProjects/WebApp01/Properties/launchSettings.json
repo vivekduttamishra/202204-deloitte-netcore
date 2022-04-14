@@ -26,12 +26,11 @@
         },
         "K Production": {
             "commandName": "Project",
-            "launchBrowser": true,
-            "applicationUrl": "http://localhost:6000",
-          "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Production"
+            "launchBrowser": false,
+            "applicationUrl": "http://localhost",
+            "environmentVariables": {
 
-          }
+            }
         },
         "HarryPotter": {
             "commandName": "Project",

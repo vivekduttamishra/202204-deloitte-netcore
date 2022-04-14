@@ -1,0 +1,27 @@
+﻿@model int
+
+
+<h1>Table of @Model</h1>
+
+
+<table class="multiplication-table">
+    <thead>
+        <tr>           
+            <th>Multiplication</th>            
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @for(int i = 1; i <= 10; i++)
+        {
+            <tr>
+                <td>
+                    @Model * @i = @(Model*i)  
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+

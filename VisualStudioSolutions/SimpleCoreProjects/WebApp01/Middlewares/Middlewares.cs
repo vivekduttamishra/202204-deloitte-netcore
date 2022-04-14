@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApp01.Services;
-
 using Microsoft.Extensions.DependencyInjection;
+
 namespace WebApp01.Middlewares
 {
 
@@ -59,28 +60,41 @@ namespace WebApp01.Middlewares
             });
         }
 
-        public static void UseProctectedRoute(this IApplicationBuilder app, string url, RequestDelegate requestDelegate)
+
+        public static void UseBefore(this IApplicationBuilder app, RequestDelegate action)
         {
             app.Use(next => async context =>
-            {
-                var service = context.RequestServices.GetService<ISimpleUserManagementService>();
-                var token = context.Request.Query["token"];
+           {
+               await action(context);
+               await next(context);
+           });
+        }
 
-                if (context.Request.Path.Value != url)
-       
-                {
-                    await next(context);
-                }
-                else if (context.Request.Path.Value == url && service.TokenAuthentication(token))
-                {
-                    await requestDelegate(context);
-                }
-                else
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("Token is not process, so unauthroized");
-                }
+
+        public static void UseAfter(this IApplicationBuilder app, RequestDelegate action)
+        {
+            app.Use(next => async context =>
+            {   
+                await next(context);
+                await action(context);
             });
         }
+
+
+       public static void UsePeformanceLogger(this IApplicationBuilder app)
+        {
+            app.Use( next => async context =>
+            {
+                var logger = context.RequestServices.GetService<ILogger<object>>();
+                var stopWatch= Stopwatch.StartNew();
+                await next(context);
+                stopWatch.Stop();
+                logger.LogInformation($"{context.Request.Path} took {stopWatch.ElapsedMilliseconds} ms to complete");              
+                
+
+            });
+        }
+
+
     }
 }

@@ -1,0 +1,39 @@
+﻿@{ 
+    Layout = null; //don't use the layout
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Info - </title>
+    <link href="~/app.css" rel="stylesheet" />
+</head>
+<body>
+
+    <header>
+        <h1>Info Server</h1>
+        <nav>
+            <a href="/info/home">Home</a>
+            <a href="/info/help">Help</a>
+        </nav>
+    </header>
+
+    <div class="content">
+
+        <h1>Info - Home</h1>
+        @{
+            var date = DateTime.Now;
+        }
+
+        <p>Date is <strong>@date.ToLongDateString()</strong></p>
+        <p>Time is <strong>@date.ToLongTimeString()</strong></p>
+
+    </div>
+
+    <footer>
+        &copy; vivek@conceptarchitect.in | follow us on @@vivekdmishra
+    </footer>
+
+
+</body>
+</html>
