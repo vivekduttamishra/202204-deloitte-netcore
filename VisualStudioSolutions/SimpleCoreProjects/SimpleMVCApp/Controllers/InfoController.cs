@@ -146,7 +146,15 @@ namespace SimpleMVCApp
 
 
         }
-                        
+               
+        public ActionResult Welcome(string guests)
+        {
+            var guestList = guests.Split(",");
+
+            return View(guestList);
+        }
+
+
 
     }
 }

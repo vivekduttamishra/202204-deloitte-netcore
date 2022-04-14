@@ -1,11 +1,9 @@
-﻿@{ 
-    Layout = null; //don't use the layout
-}
+﻿
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Info - </title>
+    <title>Info Server   @RenderSection("title", false)</title>
     <link href="~/app.css" rel="stylesheet" />
 </head>
 <body>
@@ -20,13 +18,7 @@
 
     <div class="content">
 
-        <h1>Info - Home</h1>
-        @{
-            var date = DateTime.Now;
-        }
-
-        <p>Date is <strong>@date.ToLongDateString()</strong></p>
-        <p>Time is <strong>@date.ToLongTimeString()</strong></p>
+           @RenderBody()   
 
     </div>
 
