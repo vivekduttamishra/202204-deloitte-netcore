@@ -19,6 +19,7 @@ namespace MiddleWarePractice
         {
             services.AddSingleton<IStatsService, StatsService>();
             services.AddSingleton<IUserManagementService, InMemoryUserManagementService>();
+            services.AddControllersWithViews();
         }
 
 
@@ -27,12 +28,15 @@ namespace MiddleWarePractice
             IStatsService statsService, IUserManagementService userManagementService)
         {
             if (env.IsDevelopment())
-                app.myDevExceptionHandle();
+                app.MyDevExceptionHandle();
             else
-                app.myProdExceptionHandle();
+                app.MyProdExceptionHandle();
 
             app.UseStats();
+            app.UseStatic();
+            app.UseRouting();
 
+            
             app.UseOnUrl("/books", async context =>
             {
                 throw new Exception("my own exceptions");
@@ -129,6 +133,15 @@ namespace MiddleWarePractice
             {
                 await context.Response.WriteAsync($"you have accessed proctected route");
             });
+
+
+            app.UseEndpoints(end =>
+            {
+                end.MapControllerRoute("MyMvcRoute",
+                    "{controller=math}/{action=table}/{start}/{end?}"
+                );
+            });
+
         }
     }
 }

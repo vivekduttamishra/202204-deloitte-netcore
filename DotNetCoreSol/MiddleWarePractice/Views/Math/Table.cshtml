@@ -1,0 +1,18 @@
+﻿@model MiddleWarePractice.Controllers.Multiply
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Table</title>
+</head>
+<body>
+
+    @for (var i = 1; i <= Model.End; i++)
+   {
+        <p> @Model.Start * @i = @(Model.Start* i) </p>
+    }
+
+</body>
+</html>
