@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Authors>
+
+
+<h1>Recommended Authors</h1>
+
+<div class="row">
+    @foreach (var author in Model)
+    {
+        <a class="col col-6" href="@Url.Action("Details", "Author",new { id = author.Id })">
+            <img src="@author.AuthorUrl" class="list-photo" alt="@author.Name" title="@author.Name" />
+            <h2>@author.Name</h2>
+        </a>
+    }
+</div>

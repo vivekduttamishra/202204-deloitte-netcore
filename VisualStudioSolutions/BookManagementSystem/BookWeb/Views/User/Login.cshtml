@@ -1,0 +1,13 @@
+﻿@model Users
+
+<h1>Login here!</h1>
+
+@using (Html.BeginForm("Submit", "User", FormMethod.Post))
+{
+    <span>Enter Your Email: </span> @Html.TextBoxFor(m => m.Email)
+    <br />
+    <span>Enter Your Password: </span>@Html.TextBoxFor(m => m.Password)
+    <br />
+
+    <input id="Submit" type="submit" value="submit" />
+}
