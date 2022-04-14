@@ -1,84 +1,99 @@
 using System.Diagnostics;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
 var app = builder.Build();
 
-app.SetValidPaths(new string[] {"/books", "/time", "/stats" });
 
-app.HandleUrl();
+app.Use(async (context, next) =>
+{
+    await next.Invoke();
 
-app.ShowStats();
+    if (context.Response.StatusCode == 200)
+    {
+        if(UrlHandler.validUrlArray.ContainsKey(context.Request.Path.Value.ToLower()))
+            UrlHandler.validUrlArray[context.Request.Path.Value.ToLower()]++;
+        else
+            UrlHandler.validUrlArray.Add(context.Request.Path.Value.ToLower(), 1);
+    }
+    else
+    {
+        UrlHandler.invalidUrls.Add(context.Request.Path.Value);
+    }
+});
 
-app.ShowErrorUrls();
+//books
+app.Use(async (context, next) =>
+{
+    if(context.Request.Path.Value.StartsWith("/books"))
+        await context.Response.WriteAsync("Books");
+    
+    else
+        await next.Invoke();
+});
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.Value.StartsWith("/time"))
+        await context.Response.WriteAsync(DateTime.Now.ToLongTimeString());
+    
+    else
+        await next.Invoke();
+});
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.Value.StartsWith("/stats"))
+        foreach (var item in UrlHandler.validUrlArray)
+        {
+            await context.Response.WriteAsync(item.Key + ":" + item.Value + Environment.NewLine);
+        }
+
+    else
+        await next.Invoke();
+});
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.Value.StartsWith("/404"))
+        foreach(var item in UrlHandler.invalidUrls)
+        {
+            await context.Response.WriteAsync(item + Environment.NewLine);
+        }
+
+    else
+        await next.Invoke();
+});
+
+app.Use(async (context, next) =>
+{
+    var filePath = context.Request.Path.Value;
+
+    var fullPath = Path.Join(builder.Environment.ContentRootPath, filePath);
+    if (File.Exists(fullPath))
+    {
+        await context.Response.WriteAsync(File.ReadAllText(fullPath));
+    }
+    else
+        await next.Invoke();
+});
+
+app.UseStaticFiles();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{num1?}/{num2?}");
 
 app.Run();
 
 
-public static class UrlRequestCounter
+public static class UrlHandler
 {
-    private static Dictionary<string, int> urlTracker = new Dictionary<string, int>();
+    public static Dictionary<string, int> validUrlArray = new Dictionary<string, int>();
 
-    private static string[] validUrlArray = new string [] { };
-
-    private static List<string> invalidUrls = new List<string>();
-
-    public static void SetValidPaths(this IApplicationBuilder app, string[] validPaths)
-    {
-        validUrlArray = validPaths;
-    }
-
-    public static void HandleUrl(this IApplicationBuilder app)
-    {
-        app.Use(async (context, next) =>
-        {
-            if (validUrlArray.Any(x => context.Request.Path.Value.ToLower().StartsWith(x)))
-            {
-                await context.Response.WriteAsync(context.Request.Path.Value.ToUpper() + Environment.NewLine);
-
-                if (urlTracker.Keys.Any(x => x.ToLower() == context.Request.Path.Value.ToLower()))
-                    urlTracker[context.Request.Path.Value.ToLower()]++;
-                else
-                    urlTracker.Add(context.Request.Path.Value.ToLower(), 1);
-            }
-            else
-            {
-                if(!invalidUrls.Contains(context.Request.Path.Value.ToLower()))
-                    invalidUrls.Add(context.Request.Path.Value.ToLower());
-            }
-            
-            next.Invoke();
-        });   
-    }
-
-    public static void ShowStats(this IApplicationBuilder app)
-    {
-        app.Use(async (context, next) =>
-        {
-            if (context.Request.Path.Value.ToLower().StartsWith("/stats"))
-            {
-                foreach(var item in urlTracker)
-                {
-                    await context.Response.WriteAsync(item.Key.ToLower() + ":" + item.Value + Environment.NewLine);
-                }
-            }
-
-            next.Invoke();
-        });
-    }
-
-    public static void ShowErrorUrls(this IApplicationBuilder app)
-    {
-        app.Use(async (context, next) =>
-        {
-            if (context.Request.Path.Value.ToLower().StartsWith("/404"))
-            {
-                foreach (var item in invalidUrls)
-                {
-                    await context.Response.WriteAsync(item + Environment.NewLine);
-                }
-            }
-
-            next.Invoke();
-        });
-    }
+    public static List<string> invalidUrls = new List<string>();
 }
+
