@@ -32,3 +32,18 @@ footer{
 .error-text{
     color:indianred;
 }
+
+.multiplication-table{
+    width:150px;
+    border:2px solid black;
+}
+
+.multiplication-table tr{
+    border:1px solid gray;
+    
+}
+
+.multiplication-table th{
+    background:black;
+    color:white;
+}

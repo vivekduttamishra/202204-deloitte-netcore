@@ -33,10 +33,17 @@ namespace SimpleMVCApp
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("MyMvcRoute",
-                    "{controller=info}/{action=home}/{id?}"
-                    
+
+                endpoints.MapControllerRoute("MathRoute",
+                   "generate/{action}/{number1?}/{number2?}",
+                   new {controller="math"}
                 );
+
+                endpoints.MapControllerRoute("MyMvcRoute",
+                    "{controller=info}/{action=home}/{id?}"                   
+                );
+
+               
             });
         }
     }
