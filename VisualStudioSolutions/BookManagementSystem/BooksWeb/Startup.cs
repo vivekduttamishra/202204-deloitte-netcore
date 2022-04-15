@@ -48,7 +48,7 @@ namespace BooksWeb
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Author}/{action=Index}/{id?}");
+                    pattern: "{controller=Author}/{action=Create}/{id?}");
             });
         }
     }
