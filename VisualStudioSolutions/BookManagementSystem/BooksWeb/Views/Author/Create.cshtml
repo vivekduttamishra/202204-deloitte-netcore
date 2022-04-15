@@ -1,13 +1,14 @@
 ﻿@model ConceptArchitect.BookManagement.Author
 
 
-<h1>Create</h1>
 
-<h4>Author</h4>
+
+<h4>Add Author</h4>
+@DateTime.Now.ToLongTimeString()
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="AddAuthor">
+        <form asp-action="AddAuthor"  novalidate>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Id" class="control-label"></label>
@@ -55,3 +56,9 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Scripts{ 
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+}
