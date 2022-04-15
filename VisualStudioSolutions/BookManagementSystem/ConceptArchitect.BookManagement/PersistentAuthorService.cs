@@ -18,7 +18,7 @@ namespace ConceptArchitect.BookManagement
             //step1: add the required validation
             if (author == null || string.IsNullOrEmpty(author.Id) || string.IsNullOrEmpty(author.Name))
                 throw new ArgumentException("Invalid Author Object");
-            var a = GetAuthorById(author.Id);
+            var a =await GetAuthorById(author.Id);
             if (a != null)
                 throw new InvalidOperationException($"Duplicate Author Id: {author.Id}");
 

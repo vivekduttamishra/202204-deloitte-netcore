@@ -20,7 +20,7 @@ namespace ConceptArchitect.BookManagement
         public string Email { get; set; }
         
         [Required]
-        [PhotoUrl]
+       // [PhotoUrl]
         public string Photo { get; set; }
 
         [Required]
