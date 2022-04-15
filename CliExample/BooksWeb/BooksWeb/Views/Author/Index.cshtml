@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Author>
+
+
+<h1>Recommended Authors</h1>
+
+<div class="row">
+    @foreach (var author in Model)
+    {
+        <a class="col col-6" href="/author/details/@author.Id">
+            <img src="@author.Photo" class="list-photo" alt="@author.Name" title="@author.Name" />
+            <h2>@author.Name</h2>
+        </a>
+    }
+</div>

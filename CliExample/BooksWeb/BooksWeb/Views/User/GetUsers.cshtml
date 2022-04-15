@@ -1,0 +1,15 @@
+﻿@model IEnumerable<UserRegister>
+
+
+<h1>Registerd Users</h1>
+
+<div class="row">
+    @foreach (var user in Model)
+    {
+    <a class="col col-6" href="/author/details/@user.ID">
+
+        <h2>@user.Name</h2>
+        <h2>@user.Email</h2>
+    </a>
+    }
+</div>
