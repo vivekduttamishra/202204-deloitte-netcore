@@ -84,5 +84,25 @@ namespace ConceptArchitect.BookManagement
             else
                 return null;
         }
+
+        public Task<IList<Author>> Search(string term)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<Book>> GetBooksByAuthor(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAuthor(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAuthor(Author author)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

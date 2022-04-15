@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ConceptArchitect.BookManagement
 {
     [Age(MinAge =10, MaxAge =120)]
+    [Serializable]
     public class Author
     {
         [Required]
