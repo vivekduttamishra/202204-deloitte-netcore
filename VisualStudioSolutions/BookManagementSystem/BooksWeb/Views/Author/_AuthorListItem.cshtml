@@ -1,0 +1,17 @@
+﻿@model Author
+
+
+
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="@Model.Photo" alt="@Model.Name" title="@Model.Biography">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        
+        @Html.ActionLink("Info", "Details", new { Id = Model.Id },new { @class = "btn btn-primary" })
+
+
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+
+

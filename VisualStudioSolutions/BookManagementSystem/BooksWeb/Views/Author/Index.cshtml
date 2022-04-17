@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Author>
+
+
+<h1>Recommended Authors</h1>
+
+<a asp-action="create" class="btn btn-outline-primary">Add Author</a>
+<p/>
+
+<div class="row author-list">
+    @foreach(var author in Model)
+    {
+        <partial name="_AuthorListItem" model="@author" />
+    }
+</div>

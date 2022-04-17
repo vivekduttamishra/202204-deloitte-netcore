@@ -1,0 +1,52 @@
+﻿@model ConceptArchitect.BookManagement.Author
+
+
+
+
+
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+
+    <div class="row">
+        <div class="col col-8">
+            <dl class="row">
+
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Biography)
+                </dt>
+                <dd class="col-sm-10">
+                    <p>@Html.DisplayFor(model => model.Biography)</p>
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.BirthDate)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.BirthDate)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.DeathDate)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.DeathDate)
+                </dd>
+            </dl>
+        </div>
+        <div class="col col-4">
+            <img src="@Model.Photo" title="@Model.Name" alt="@Model.Name" class="profile-photo" />
+        </div>
+
+    </div>
+    
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

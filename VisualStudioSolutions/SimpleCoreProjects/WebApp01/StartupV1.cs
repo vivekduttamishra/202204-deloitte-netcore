@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
+using WebApp01.Middlewares;
 
 namespace WebApp01
 {
@@ -47,19 +48,19 @@ namespace WebApp01
 
             });
 
+            
+
             app.UseOnUrl("/date", async context =>
             {
                 await context.Response.WriteAsync($"Date is : {DateTime.Now.ToLongDateString()}");
             });
 
-            Middlewares.UseOnUrl(app,"/time", async context =>
+            MyMiddlewares.UseOnUrl(app,"/time", async context =>
             {
                   await context.Response.WriteAsync($"Time now is {DateTime.Now.ToLongTimeString()}");
 
             });
 
-
-           
 
             app.Use (next => async context =>
             {
@@ -72,25 +73,42 @@ namespace WebApp01
 
             app.Use(next => {
 
+                Console.WriteLine("Configuring the catch all middleware");
+
                 RequestDelegate thisMiddleware = async context =>
                 {
                     //perform whatever you want to
+                    Console.WriteLine("Reached to Catch All Middleware");
                     await context.Response.WriteAsync($"Handled {context.Request.Path}");
                 };
 
                 return thisMiddleware;
             });
 
+            app.Use(Greeter);
+
+
+
+            //middleware will be configured, but request shall never reach it
             app.Run(async context =>
             {
+                Console.WriteLine("reached to Time Middleware");
                 await context.Response.WriteAsync($"Time: {DateTime.Now.ToLongTimeString()}");
             });
 
-
-            //unreachable code
+            //this is called at startup
+            Console.WriteLine("reached to Greet Middleware");
+            //The middleware is configured. but because of earlier middleware
+            //It will never receive the request
             app.Run(new RequestDelegate(Greet));
 
         }
+
+        public RequestDelegate Greeter (RequestDelegate next)
+        {
+            return Greet;
+        }
+
 
         private async Task Greet(HttpContext context)
         {

@@ -1,0 +1,31 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Info Server   @RenderSection("title", false)</title>
+    <link href="~/app.css" rel="stylesheet" />
+</head>
+<body>
+
+    <header>
+        <h1>Info Server</h1>
+        <nav>
+            <a href="/info/home">Home</a>
+            <a href="/info/help">Help</a>
+        </nav>
+    </header>
+
+    <div class="content">
+
+           @RenderBody()   
+
+    </div>
+
+    <footer>
+        &copy; vivek@conceptarchitect.in | follow us on @@vivekdmishra
+    </footer>
+
+
+</body>
+</html>

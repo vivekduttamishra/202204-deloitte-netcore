@@ -1,0 +1,21 @@
+﻿@model SimpleMVCApp.Entities.MultiplicationTable
+
+
+<h1>Table of @Model.Number x @Model.HightestMultiplier </h1>
+
+
+<table class="multiplication-table">
+    <thead>
+        <tr>
+            <th>Table</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Number1 x @row.Number2 = @row.Result</td>
+            </tr>
+        }
+    </tbody>
+</table>

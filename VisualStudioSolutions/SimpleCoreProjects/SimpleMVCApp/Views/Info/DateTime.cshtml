@@ -1,0 +1,14 @@
+﻿@model SimpleMVCApp.Entities.DateInfo
+
+
+
+<h1>Time Server - @Model.Title</h1>
+<p>Date is <strong>@Model.Date.ToLongDateString()</strong></p>
+<p>Time is <strong>@Model.Date.ToLongTimeString()</strong></p>
+
+ 
+@section title{ 
+
+   -  @Model.Title
+
+}
