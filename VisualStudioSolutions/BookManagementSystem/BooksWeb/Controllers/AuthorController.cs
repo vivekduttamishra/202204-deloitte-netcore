@@ -27,5 +27,33 @@ namespace BooksWeb.Controllers
             var author = await authorService.GetAuthorById(id);
             return View(author);
         }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            await Task.Yield();
+            return Content($"Author with id {id} deleted");
+        }
+
+        public IActionResult Create()
+        {
+            var author = new Author();
+            return View(author);
+        }
+
+        public async Task<IActionResult> AddAuthor(Author author)
+        {
+            if(ModelState.IsValid)
+            {
+                await authorService.AddAuthor(author);
+                return RedirectToAction("Details", new { Id= author.Id });
+            }
+            else
+            {
+                //go back to the same page and say there is an error
+                return View("Create");
+            }
+            //return Json(author);
+           
+        }
     }
 }

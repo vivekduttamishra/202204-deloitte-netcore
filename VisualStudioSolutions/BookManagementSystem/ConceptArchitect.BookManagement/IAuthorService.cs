@@ -8,5 +8,13 @@ namespace ConceptArchitect.BookManagement
         Task AddAuthor(Author author);
         Task<IList<Author>> GetAllAuthors();
         Task<Author> GetAuthorById(string id);
+
+        Task<IList<Author>> Search(string term);
+
+        Task<IList<Book>> GetBooksByAuthor(string id);
+
+        Task RemoveAuthor(string id);
+
+        Task UpdateAuthor(Author author);
     }
 }

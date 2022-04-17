@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace ConceptArchitect.BookManagement
 {
+    [Serializable]
     public class Book
     {
         public string Isbn { get; set; }

@@ -1,0 +1,16 @@
+﻿@model Book
+
+
+
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+
+        @Html.ActionLink("Info", "Details", new { Id = Model.Isbn }, new { @class = "btn btn-primary" })
+
+
+        <a asp-action="Delete" asp-route-id="@Model.Isbn" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+
+

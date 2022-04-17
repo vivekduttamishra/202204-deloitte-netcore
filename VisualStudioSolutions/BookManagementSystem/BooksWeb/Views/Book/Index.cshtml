@@ -1,4 +1,14 @@
-﻿
-<h1>List of Books</h1>
+﻿@model IEnumerable<Book>
 
 
+<h1>Recommended Books</h1>
+
+<a asp-action="create" class="btn btn-outline-primary">Add Book</a>
+<p />
+
+<div class="row book-list">
+    @foreach (var book in Model)
+    {
+        <partial name="_BookListItem" model="@book" />
+    }
+</div>

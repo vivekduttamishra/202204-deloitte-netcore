@@ -23,26 +23,26 @@ namespace ConceptArchitect.BookManagement
                 new Author()
                 {
                     Name="Alexandre Dumas",
-                    Photo="https://m.media-amazon.com/images/I/51Fncy7geTL._SX450_.jpg",
+                    Photo="https://biographygist.com/wp-content/uploads/2021/05/Alexandre-Dumas1.jpg",
                     Biography="One of the altime greatest author of English and French"
                 },
                 new Author()
                 {
                     Name="Conan Doyle",
-                    Photo="https://m.media-amazon.com/images/S/amzn-author-media-prod/s0gktk6c6oen9bivv1vlnd9bq9._SX450_.jpg",
+                    Photo="https://cdn.vocab.com/units/fsyoq26b/author.jpg?width=400&v=16d64ff4cf4",
                     Biography="The creator of famous Sherlock Holmes"
                 },
                 new Author()
                 {
                     Name="Jeffrey Archer",
-                    Photo="https://m.media-amazon.com/images/S/amzn-author-media-prod/8tf5spo4ri40bkl7hrvrd7t4q9._SX450_.jpg",
+                    Photo="https://pbs.twimg.com/media/FIgReE4WUAEw9cL.jpg",
                     Biography ="One of the contemporary best seller author in English Fiction"
                 },
 
                 new Author()
                 {
                     Name="John Grisham",
-                    Photo="https://m.media-amazon.com/images/S/amzn-author-media-prod/d661gj9v9di7dgupcm7st49gpt._SX450_.jpg",
+                    Photo="https://res.cloudinary.com/bookbub/image/upload/w_400,h_400,c_fill,g_face/v1580317832/john-grisham.jpg",
                     Biography="Best seller author Legal Fiction"
                 }
 
@@ -83,6 +83,26 @@ namespace ConceptArchitect.BookManagement
                 return authors[id];
             else
                 return null;
+        }
+
+        public Task<IList<Author>> Search(string term)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IList<Book>> GetBooksByAuthor(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAuthor(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAuthor(Author author)
+        {
+            throw new NotImplementedException();
         }
     }
 }
