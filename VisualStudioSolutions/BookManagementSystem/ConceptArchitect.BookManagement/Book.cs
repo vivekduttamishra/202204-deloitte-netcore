@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ConceptArchitect.BookManagement
 {
     [Serializable]
     public class Book
     {
+        [Key]   //specifiy primary key        
         public string Isbn { get; set; }
 
 
@@ -20,7 +22,9 @@ namespace ConceptArchitect.BookManagement
 
         public double Rating { get; set; }
 
-        public List<string> Tags { get; set; } = new List<string>();
+        public string Tags { get; set; }
 
+
+        public IList<Review> Reviews { get; set; }
     }
 }

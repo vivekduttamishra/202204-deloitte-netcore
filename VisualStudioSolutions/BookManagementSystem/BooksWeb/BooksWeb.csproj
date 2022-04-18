@@ -5,11 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.24" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.24" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.24" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.24">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ConceptArchitect.BookManagement.Repositories.BookStoreRepository\ConceptArchitect.BookManagement.Repositories.BookStoreRepository.csproj" />
+    <ProjectReference Include="..\ConceptArchitect.BookManagement.Repositories.EFRepository\ConceptArchitect.BookManagement.Repositories.EFRepository.csproj" />
     <ProjectReference Include="..\ConceptArchitect.BookManagement\ConceptArchitect.BookManagement.csproj" />
   </ItemGroup>
 

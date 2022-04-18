@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20220418092638_Employee_Id_Added.cs" />
+    <Compile Remove="Migrations\20220418092638_Employee_Id_Added.Designer.cs" />
+    <Compile Remove="Migrations\20220418093106_Employee_ID_Added.cs" />
+    <Compile Remove="Migrations\20220418093106_Employee_ID_Added.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.24" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.24">
+      <PrivateAssets></PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConceptArchitect.BookManagement\ConceptArchitect.BookManagement.csproj" />
+  </ItemGroup>
+
+</Project>

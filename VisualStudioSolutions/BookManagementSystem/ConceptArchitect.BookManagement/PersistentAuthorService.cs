@@ -41,7 +41,7 @@ namespace ConceptArchitect.BookManagement
         {
             var author = await GetAuthorById(id);
             if (author != null)
-                return author.Books;
+                return null;
             else
                 return null;
 

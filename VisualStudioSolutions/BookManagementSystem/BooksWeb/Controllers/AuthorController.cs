@@ -34,23 +34,25 @@ namespace BooksWeb.Controllers
             return Content($"Author with id {id} deleted");
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             var author = new Author();
             return View(author);
         }
 
-        public async Task<IActionResult> AddAuthor(Author author)
+        [HttpPost]
+        public async Task<IActionResult> Create(Author author)
         {
             if(ModelState.IsValid)
             {
                 await authorService.AddAuthor(author);
-                return RedirectToAction("Details", new { Id= author.Id });
+                return RedirectToAction("Index", new { Id= author.Id });
             }
             else
             {
                 //go back to the same page and say there is an error
-                return View("Create");
+                return View();
             }
             //return Json(author);
            

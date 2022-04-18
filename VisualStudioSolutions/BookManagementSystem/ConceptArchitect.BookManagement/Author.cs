@@ -35,7 +35,9 @@ namespace ConceptArchitect.BookManagement
         [DataType(DataType.Date)]
         [PastDate(Days =0)]
         public DateTime? DeathDate { get; set; }
+
         
+
         public IList<Book> Books { get; set; } = new List<Book>();
     }
 }
